@@ -2,31 +2,47 @@
 
 The romantic side of me never expected to work in tech. English and History double major, five years in government work and immigration law, months coordinating field operations for a voter registration drive, and I think it's pretty obvious to anybody reading this that I spent most of my early career trying to be somebody else. It took me a while to stop pushing down that critical quality: that I was an utter nerd who loved understanding how systems fit together.
 
-QA engineer at Intuit Mailchimp now, and the testing problems I keep gravitating toward are the ones where a fixed assertion misses the point. LLM outputs are probabilistic. Accessibility violations give you an ID, not the actual HTML change. Privacy claims are easy to make and hard to prove from reading the code. Each one needed its own evaluation harness, because the off-the-shelf tools either don't exist or they stop one step short of useful. The four repos below are where that went.
+QA engineer at Intuit Mailchimp now, and the testing problems I keep gravitating toward are the ones where a fixed assertion misses the point. LLM outputs are probabilistic. Accessibility violations give you an ID, not the actual HTML change. Privacy claims are easy to make and hard to prove from reading the code. Each one needed its own evaluation harness, because the off-the-shelf tools either don't exist or they stop one step short of useful. The five repos below are where that went.
 
 ---
 
 ## Projects
 
-### [research-synthesis-prompt](https://github.com/weijia-89/research-synthesis-prompt)
+### [vibe-check](https://github.com/weijia-89/vibe-check)
 
-A multi-agent research prompt iterated over several months to produce epistemic research reports. No more getting 'well actually' when you talk about your favorite new habit you picked up, now you'll be the one going on about the replication crises and the importance of the hierarchy of evidence.
+A reviewer evidence surfacer for PRs that may contain LLM-generated code. It runs ten regex and AST heuristics in Python stdlib alone, with no trained model and no outbound network except `gh` for PR mode, and reports per-signal evidence (hallucinated APIs, bare `except:` blocks, AI tool markers, comment-phrasing boilerplate, declarative bias, and a handful of others documented in `references/AI_SIGNALS_RESEARCH.md`). The ten signals each have their own regression tests and a calibration ledger that records why every threshold is where it is.
 
-Each run coordinates three independent LLM research agents and then passes their combined output to a separate adversarial synthesis agent before anything reaches the report. The system can't surface a high-confidence claim without showing the source text that backs it, and it's instructed to adversarially self-review, to disconfirm instead of just taking everything it outputs as truth. Cross-agent disagreements surface as `[CONFLICT]` flags so the synthesis agent has to deal with them on the way through. The part that took the most work wasn't the synthesis logic but building in the understanding that three agents agreeing doesn't mean three independent data points. Just because all the people at your gym drink pre-workout doesn't mean that the 2000% of your DV of taurine they're taking will be anything more than placebo effect. The goal is to incorporate skepticism, not normalize global confusion.
+Recent benchmarks (AICD Bench 2026, Wang ICSE 2025; CLAIMS C-005, C-008) report detectors of this class as below practical usability under distribution shift. The README repeats that in three places, the strict-quotes gate in CI prevents anyone from quoting drift-affected accuracy numbers as if they were stable, and the tool's stated job is to slow a reviewer down on suspicious patterns rather than to gate merge. The repo is also where I worked through what an honest evidence ledger looks like when the underlying claim is contested.
 
-The latest version names the agents by capability class instead of by provider (live-web search, deep-research, strong reasoning, highest-reasoning long-context synthesis), because the bit that matters is whether the three agents share an architecture, not whose logo they carry. There's a published number for this. About 60% of the time, two same-provider models will get the same thing wrong in the same way (arXiv 2506.07962), and the prompt's job is to assume that's happening unless something forces it to update.
+`AI detection` `code review` `Python` `regex` `AST` `calibration` `Brier score`
 
-`multi-agent` `adversarial synthesis` `evidence methodology` `confidence scoring` `prompt engineering`
+---
+
+### [palamedes](https://github.com/weijia-89/palamedes)
+
+Rigorous LLM research in two layers. A multi-agent dialectic synthesis prompt for one-shot human-driven deep research, plus an agent-loadable skill that gives an LLM coding agent the same epistemic discipline at the coding-task level. Both share one canonical evidence-tier table, one confidence-calibration doc, and one failure-log.
+
+Each synthesis run coordinates three independent LLM research agents and then passes their combined output to a separate adversarial synthesis agent before anything reaches the report. The system can't surface a high-confidence claim without showing the source text that backs it, and it is instructed to adversarially self-review, to disconfirm rather than just take everything it outputs as truth. The part that took the most work was building in the understanding that three agents agreeing does not mean three independent data points. About 60% of the time, two same-provider models will get the same thing wrong in the same way (arXiv 2506.07962), and the prompt's job is to assume that is happening unless something forces it to update. This repo consolidates `research-synthesis-prompt` and `ai-research`, which were merged on 2026-05-16 because they were doing the same epistemics at two different scales.
+
+`multi-agent` `adversarial synthesis` `evidence methodology` `confidence scoring` `prompt engineering` `agent skill`
+
+---
+
+### [playwrighter](https://github.com/weijia-89/playwrighter)
+
+A Playwright pattern library plus a working test-quality scorer, so an AI agent or a human writing E2E tests has both the patterns to follow and an automated way to check whether the suite actually follows them. The 23 pattern files under `patterns/` trace to Playwright's official docs and to conventions I verified across community projects, and `tools/score-tests.js` grades a directory of `.spec.ts` files against a rubric that mirrors the patterns directly. A `waitForTimeout` call costs 8 points, a CSS-selector locator costs 6, and the full rubric scores out of 100 with an 80-point CI threshold.
+
+The scorer is intentionally regex-and-AST simple. It catches the syntactic decay that creeps into a suite over time, from the flake-fix that introduced a `waitForTimeout` to the quick-locator shortcut that landed a CSS selector instead of an accessible role, and it fails CI before the reviewer has to find them. The library and the scorer share a vocabulary, so a contributor or an AI agent reading the SKILL ends up writing tests that pass the scorer because the patterns and the rubric are the same artifact. The skill ships as a multi-tool bundle for Claude, Cursor, and Windsurf.
+
+`Playwright` `E2E testing` `pattern library` `test quality scorer` `AI agent skill` `TypeScript` `JavaScript`
 
 ---
 
 ### [oncology-rag-lab](https://github.com/weijia-89/oncology-rag-lab)
 
-A working LLM pipeline (LlamaIndex + ChromaDB + Ollama) that pulls oncology entities out of synthetic clinical notes: AJCC stage, regimen, ECOG, cancer type. The pipeline isn't the interesting part. The testing infrastructure around it is what I spent the time on: DeepEval metrics, Arize Phoenix observability, A/B drift comparison between model versions, a regression gate that fails CI if the pass rate drops more than 5 points. Same patterns a production oncology platform runs at 150M documents, scaled down to 20 synthetic notes on a laptop.
+A working LLM pipeline (LlamaIndex + ChromaDB + Ollama) that pulls oncology entities out of synthetic clinical notes (AJCC stage, regimen, ECOG, cancer type). The pipeline isn't the interesting part. The testing infrastructure around it is what I spent the time on, the DeepEval suite scored against gold-standard labels, the regression gate that fails CI if pass rate drops more than 5% versus baseline, A/B drift detection between model versions, and Arize Phoenix tracing every retrieval and extraction. Same patterns a production oncology platform runs at 150M documents, scaled down to 20 synthetic notes on a laptop.
 
-The 20 notes break out as 8 base notes plus 12 adversarial edge cases I wrote specifically to fail naive extraction. Copy-forward staleness. Half-filled SmartPhrase templates. Dragon transcription errors. Two different staging systems showing up in the same chart. A real clinical-NLP extractor has to survive all of that and more.
-
-The synthetic corpus has known limits and `FIDELITY_REVIEW.md` writes them down. It compares the base notes against 3 de-identified MTSamples transcriptions and lists 12 specific ways the synthetic notes don't look like the real thing. An extractor that passes here is not production-ready, and saying so in the README is part of the deliverable.
+The 20 notes are 8 base notes plus 12 adversarial edge cases I wrote specifically to fail naive extraction, including copy-forward staleness, half-filled SmartPhrase templates, Dragon transcription errors, and two different staging systems showing up in the same chart. The synthetic corpus has known limits and `FIDELITY_REVIEW.md` writes them down. I compared the base notes against 3 de-identified MTSamples transcriptions and listed 12 specific ways the synthetic notes do not look like the real thing. An extractor that passes here is not production-ready, and saying so in the README is part of the deliverable.
 
 `LLM eval` `DeepEval` `RAG` `ChromaDB` `LlamaIndex` `Arize Phoenix` `drift detection` `Python`
 
@@ -34,17 +50,19 @@ The synthetic corpus has known limits and `FIDELITY_REVIEW.md` writes them down.
 
 ### [wcag-auditor](https://github.com/weijia-89/wcag-auditor)
 
-The standard WCAG workflow is: run axe-core, read the violation ID, look up the criterion, figure out what to actually change. wcag-auditor puts a deterministic rule engine in the middle of that. Playwright injects axe-core into the page, violations come back as structured objects, each one runs through a per-rule fix template that has enough HTML context to produce a suggestion specific enough to act on. Pydantic validates the output before it hits your terminal. Audit history goes into SQLite, HTML stays on the machine.
+The standard WCAG workflow is to run axe-core, read the violation ID, look up the criterion, and figure out what to actually change. wcag-auditor puts a deterministic rule engine in the middle of that. Playwright injects axe-core into the page, violations come back as structured objects, each one runs through a per-rule fix template that has enough HTML context to produce a suggestion specific enough to act on. Pydantic validates the output before it hits your terminal, and the HTML you audit never leaves your machine because nothing is sent anywhere.
 
-axe-core catches roughly 30-40% of WCAG 2.2 issues. wcag-auditor doesn't change that number. It makes the 30-40% easier to act on. An earlier version used an LLM for the fix-generation step; v0.3 swapped it for deterministic rule templates because the deterministic version was auditable, faster, and didn't need a 14GB model running in the background to spit out a suggestion that was already mostly templated anyway. Deciding to walk away from a shipped LLM feature because the boring version was just better took longer than it should have.
+axe-core catches roughly 30-40% of WCAG 2.2 issues. wcag-auditor doesn't change that number, it makes the 30-40% easier to act on. An earlier version used an LLM for the fix-generation step; v0.3 swapped it for deterministic rule templates because the deterministic version was auditable, faster, and didn't need a 14GB model running in the background to spit out a suggestion that was already mostly templated anyway. Deciding to walk away from a shipped LLM feature because the boring version was just better took longer than it should have.
 
 `accessibility` `WCAG 2.2` `axe-core` `Playwright` `Pydantic` `Python`
 
 ---
 
+## Earlier work
+
 ### [no-log-rsvp](https://github.com/weijia-89/no-log-rsvp)
 
-Stores event title, timestamp, and headcount. No names, no emails, no IPs, no accounts. Everything deletes 24h after the event. A regex PII guard rejects event descriptions containing personal information at the API boundary, and there's an eval suite that measures the guard's precision and recall on canned PII strings, because the regex is the security boundary and silent regression in the regex is the actual risk. EXIF and XMP metadata get stripped from uploaded images on the way in. `SECURITY.md` and `PRIVACY_MODEL.md` walk through the threat model, the data inventory, and what regex PII detection cannot catch (which is most things). If the threat model is operator log scraping after a breach, fine. If it's anything more serious, the architecture isn't enough and the README admits it.
+Stores event title, timestamp, and headcount. No names, no emails, no IPs, no accounts. Everything deletes 24h after the event. A regex PII guard rejects event descriptions containing personal information at the API boundary, and there's an eval suite that measures the guard's precision and recall on canned PII strings, because the regex is the security boundary and silent regression in the regex is the actual risk. EXIF and XMP metadata get stripped from uploaded images on the way in. `SECURITY.md` and `PRIVACY_MODEL.md` walk through the threat model, the data inventory, and what regex PII detection cannot catch (which is most things).
 
 `privacy engineering` `PII detection` `FastAPI` `SQLite` `Python`
 
@@ -52,13 +70,15 @@ Stores event title, timestamp, and headcount. No names, no emails, no IPs, no ac
 
 ## What connects them
 
-The thing all four of these have in common is probably that I started each one because some other tool was doing 80% of what I needed, and what ended up taking the time was building enough scaffolding around it to do something useful with the other 20%. The shape of the scaffolding varies by project. What's consistent is the section of the README where I had to write down, in plain English, which gaps the scaffolding doesn't close, which is usually the harder part of the project anyway.
+The thing all five of these have in common is probably that I started each one because some other tool was doing 80% of what I needed, and what ended up taking the time was building enough scaffolding around it to do something useful with the other 20%. The shape of the scaffolding varies by project. What's consistent is the section of the README where I had to write down, in plain English, which gaps the scaffolding doesn't close, which is usually the harder part of the project anyway.
+
+*northwind-qa joins this list once the repo is public (it's the worked Playwright example that exercises playwrighter's patterns against a React 19 SUT and ships seven real bug reports).*
 
 ---
 
 ## Stack
 
-Python · FastAPI · Playwright · axe-core · LlamaIndex · ChromaDB · DeepEval · Arize Phoenix · Ollama (oncology-rag-lab) · Pydantic · SQLite · uv · pytest · GitHub Actions
+Python · TypeScript · JavaScript · FastAPI · Playwright · axe-core · LlamaIndex · ChromaDB · DeepEval · Arize Phoenix · Ollama · Pydantic · SQLite · uv · pytest · GitHub Actions
 
 ---
 
