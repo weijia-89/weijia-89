@@ -2,7 +2,9 @@
 
 The romantic side of me never expected to work in tech. English and History double major, five years in government work and immigration law, months coordinating field operations for a voter registration drive, and I think it's pretty obvious to anybody reading this that I spent most of my early career trying to be somebody else. It took me a while to stop pushing down that critical quality: that I was an utter nerd who loved understanding how systems fit together.
 
-QA engineer at Intuit Mailchimp now, and the testing problems I keep gravitating toward are the ones where a fixed assertion misses the point. LLM outputs are probabilistic. Accessibility violations give you an ID, not the actual HTML change. Privacy claims are easy to make and hard to prove from reading the code. Each one needed its own evaluation harness, because the off-the-shelf tools either don't exist or they stop one step short of useful. The five repos below are where that went.
+QA engineer at Intuit Mailchimp now, and the testing problems I keep gravitating toward are the ones where a fixed assertion misses the point. LLM outputs are probabilistic. Accessibility violations give you an ID, not the actual HTML change. Privacy claims are easy to make and hard to prove from reading the code. Each one needed its own evaluation harness, because the off-the-shelf tools either don't exist or they stop one step short of useful. The repos below are where that went.
+
+For anyone reading this from a hiring side, the projects below are organized by what they were built to do. For AI-tooling and code-review work I'd point at `lodestar` and `vibe-check`. For test infrastructure and LLM evaluation, `playwrighter` and `oncology-rag-lab`. `palamedes` and `wcag-auditor` cover the work where the methodology was as much of the project as the code.
 
 ---
 
@@ -25,6 +27,16 @@ Rigorous LLM research in two layers. A multi-agent dialectic synthesis prompt fo
 Each synthesis run coordinates three independent LLM research agents and then passes their combined output to a separate adversarial synthesis agent before anything reaches the report. The system can't surface a high-confidence claim without showing the source text that backs it, and it is instructed to adversarially self-review, to disconfirm rather than just take everything it outputs as truth. The part that took the most work was building in the understanding that three agents agreeing does not mean three independent data points. About 60% of the time, two same-provider models will get the same thing wrong in the same way (arXiv 2506.07962), and the prompt's job is to assume that is happening unless something forces it to update. This repo consolidates `research-synthesis-prompt` and `ai-research`, which were merged on 2026-05-16 because they were doing the same epistemics at two different scales.
 
 `multi-agent` `adversarial synthesis` `evidence methodology` `confidence scoring` `prompt engineering` `agent skill`
+
+---
+
+### [lodestar](https://github.com/weijia-89/lodestar)
+
+A voice-of-customer ingestion plus agentic bug-prioritization pipeline. It pulls GitHub issues, deduplicates with embeddings, ranks by recency-engagement-label composite weights, and produces a priority report a human triager can read in one screen. The composite scorer surfaces a `ScoreBreakdown` per item, so anyone reading the rank can see why something landed where it landed, which is the design principle the whole tool is built around: severity classification remains a human judgment, the tool's job is to compress a large issue backlog into a ranked candidate set with the rationale visible.
+
+The test suite is where the discipline shows. `tests/moderate/test_patterns.py` includes false-positive avoidance tests like `test_scan_text_does_not_flag_github_handle_as_email`, which were written before the regex was tightened because the regex's failure mode was the test's job to catch. The PII detection module is covered by mutation testing via `mutmut` (`scripts/run_mutmut.sh`); the kill-rate report under `mutants/mutmut-stats.json` shows which mutants died and to which tests, so the coverage claim is backed by the actual mutation ledger rather than a line-coverage percentage.
+
+`Python` `voice of customer` `agentic prioritization` `mutation testing` `embeddings` `dedup` `PII detection`
 
 ---
 
@@ -66,11 +78,17 @@ Stores event title, timestamp, and headcount. No names, no emails, no IPs, no ac
 
 `privacy engineering` `PII detection` `FastAPI` `SQLite` `Python`
 
+### [toebeans](https://github.com/weijia-89/toebeans)
+
+A Kotlin Multiplatform + Compose pet medication tracker. The interesting part is the engineering discipline the project carries. Nineteen ADRs under `docs/adr/` walk through the design choices and why each one was made. CI runs fitness functions on every push and macrobenchmarks gate performance regressions, so the perf budget is enforced by the pipeline rather than by anyone remembering to check. The test suite covers edge cases like midnight-straddle detection for medications that span the day boundary; `MidnightStraddleDetectionTest.kt` is a useful read on test-as-spec discipline because the docstring lays out the algorithmic specification before the tests assert against it.
+
+`Kotlin Multiplatform` `Compose` `ADRs` `fitness functions` `macrobenchmarks` `test as spec`
+
 ---
 
 ## What connects them
 
-The thing all five of these have in common is probably that I started each one because some other tool was doing 80% of what I needed, and what ended up taking the time was building enough scaffolding around it to do something useful with the other 20%. The shape of the scaffolding varies by project. What's consistent is the section of the README where I had to write down, in plain English, which gaps the scaffolding doesn't close, which is usually the harder part of the project anyway.
+The thing these have in common is probably that I started each one because some other tool was doing 80% of what I needed, and what ended up taking the time was building enough scaffolding around it to do something useful with the other 20%. The shape of the scaffolding varies by project. What's consistent is the section of the README where I had to write down, in plain English, which gaps the scaffolding doesn't close, which is usually the harder part of the project anyway.
 
 *northwind-qa joins this list once the repo is public (it's the worked Playwright example that exercises playwrighter's patterns against a React 19 SUT and ships seven real bug reports).*
 
@@ -79,6 +97,12 @@ The thing all five of these have in common is probably that I started each one b
 ## Stack
 
 Python · TypeScript · JavaScript · FastAPI · Playwright · axe-core · LlamaIndex · ChromaDB · DeepEval · Arize Phoenix · Ollama · Pydantic · SQLite · uv · pytest · GitHub Actions
+
+---
+
+## Licensing
+
+The repos use three license families. The reusable patterns and pipelines (`lodestar`, `oncology-rag-lab`, `wcag-auditor`, `no-log-rsvp`, `mashit`) ship MIT because the point is for them to be adopted and built on. The methodology-as-deliverable work (`vibe-check`, `palamedes`, `playwrighter`) ships PolyForm Noncommercial 1.0.0 with an Iron Law addendum that keeps the calibration and strict-quotes guards intact in any derivative. `toebeans` ships AGPL, the right default for an end-user app where source-availability for derivatives matters. Each repo's `LICENSE` file is the source of truth.
 
 ---
 
