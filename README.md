@@ -90,7 +90,7 @@ A Kotlin Multiplatform + Compose pet medication tracker. The interesting part is
 
 The thing these have in common is probably that I started each one because some other tool was doing 80% of what I needed, and what ended up taking the time was building enough scaffolding around it to do something useful with the other 20%. The shape of the scaffolding varies by project. What's consistent is the section of the README where I had to write down, in plain English, which gaps the scaffolding doesn't close, which is usually the harder part of the project anyway.
 
-*northwind-qa joins this list once the repo is public (it's the worked Playwright example that exercises playwrighter's patterns against a React 19 SUT and ships seven real bug reports).*
+[`northwind-qa`](https://github.com/weijia-89/northwind-qa) is the worked Playwright example. It's a 51-test suite against a React 19 + Vite e-commerce SUT ([`example-e-commerce-website`](https://github.com/weijia-89/example-e-commerce-website)) that scores 91.4/100 on playwrighter's own rubric and ships seven real bug reports with regression-test guards. Not pinned because it leans on `playwrighter` for the patterns and `vibe-check` for the review side; it's the place where the two come together rather than its own argument.
 
 ---
 
