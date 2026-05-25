@@ -26,7 +26,7 @@ I'm a big nerd at heart and I'm currently deep diving into utilizing AI harnesse
 Supporting repos:
 
 - [`wcag-auditor`](https://github.com/weijia-89/wcag-auditor): Playwright + axe-core accessibility auditor. Earlier versions used local Ollama for fix suggestions; v0.3 replaced that path with deterministic templates because I wanted to stop fighting hallucinations. Still limited by what axe-core can catch which is roughly 30%~ of all issues.
-- [`palamedes`](https://github.com/weijia-89/palamedes): evidence synthesis, source tiers, quote gates, adversarial review, and confidence scoring. I'm secretly very proud of this work because it combines my inherent skepticism with a tool that can do a lot of the tedious footwork of reading systematic reviews and meta-analyses, uncovering nuances in findings, and weeding out low-quality studies that you don't realize are low-quality until you're 20 minutes deep before realizing all the p-values are suspiciously at threshholds for significance. 
+- [`palamedes`](https://github.com/weijia-89/palamedes): evidence synthesis, source tiers, quote gates, adversarial review, and confidence scoring. I'm secretly very proud of this work because it combines my inherent skepticism with a tool that can do a lot of the tedious footwork of reading systematic reviews and meta-analyses, uncovering nuances in findings, and weeding out low-quality studies that you don't realize are low-quality until you're 20 minutes deep and you notice all the p-values are suspiciously just at threshhold for significance.
 
 ## Internal work
 
