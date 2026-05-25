@@ -15,9 +15,9 @@ I'm a big nerd at heart and I'm currently deep diving into utilizing AI harnesse
 
 ## Active Projects
 
-| Repo | Why inspect it | What to look for |
+| Repo | What it is | Description |
 | --- | --- | --- |
-| [`oncology-rag-lab`](https://github.com/weijia-89/oncology-rag-lab) | Synthetic clinical RAG evaluation testbed. This is the clearest AI-eval artifact. | LlamaIndex, ChromaDB, Ollama, Pydantic schemas, DeepEval, Phoenix traces, GitHub Actions, 8 base oncology notes, 12 adversarial edge-case notes, baseline-pinned CI regression gate with 5% threshold, A/B model drift comparison, deterministic mocked LLM responses.
+| [`oncology-rag-lab`](https://github.com/weijia-89/oncology-rag-lab) | Synthetic clinical RAG evaluation testbed. | LlamaIndex, ChromaDB, Ollama, Pydantic schemas, DeepEval, Phoenix traces, GitHub Actions, 8 base oncology notes, 12 adversarial edge-case notes, baseline-pinned CI regression gate with 5% threshold, A/B model drift comparison, deterministic mocked LLM responses.
 | [`playwrighter`](https://github.com/weijia-89/playwrighter) | Playwright pattern library plus test-quality scorer. This is the QA automation bar for tests I author. | 23 pattern files, 8 templates, `validate-suite.sh`, `score-tests.js`, 100-point rubric, default 80 threshold, penalties for `waitForTimeout`, `networkidle`, brittle selectors, missing assertions, weak assertions, XPath, `nth-child`, and manual visibility checks. |
 | [`northwind-qa`](https://github.com/weijia-89/northwind-qa) | Worked Playwright suite that dogfoods playwrighter. | 50 application tests plus 1 auth setup, 45 passing outright, 5 expected-fail regression guards, 7 bug reports with repro steps, axe accessibility checks, CI, and a 91.4/100 playwrighter score. Toy SUT, useful as a worked quality-system example if you're interested in my professional work ;) |
 | [`vibe-check`](https://github.com/weijia-89/vibe-check) | Reviewer aid for PRs that may contain LLM-generated code. | 10 heuristic signals, JSON/Markdown output, drift-aware calibration, local telemetry, strict-quote claims gate, and regression tests for false positives. Less an vibe-code detector, more a vibe-check that encourages you to not just dump the diff into Claude and call it a day. |
